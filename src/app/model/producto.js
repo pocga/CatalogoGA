@@ -3,9 +3,9 @@ const Schema = mongoose.Schema;
 
 const ProductoSchema = Schema({
   _id: Schema.ObjectId,
-  id: String,
-  url_small_img: String,
-  url_full_img: String
+  idProducto: String,
+  imagen: String,
+  miniatura: String
 });
 
 
