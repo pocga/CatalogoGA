@@ -65,9 +65,10 @@ var catalogo = [{
 
 router.get('/catalogo/productos/', async (req, res) => {
     console.log("file");   
-    precioMenor = req.query.from;
-    precioMenor = req.query.to;
-    categ = req.query.categ;
+    precioMenor = req.query.from ? req.query.from : 0;
+    precioMayor= req.query.to ? req.query.to :0;
+    categ = req.query.categ ? req.query.categ :0; 
+    disp= req.query.disp? req.query.disp:0; 
     console.log(categ);
     let result;
     try{
@@ -99,13 +100,13 @@ router.get('/catalogo/productos/', async (req, res) => {
             })
             console.log(categ);
             
-            filterBy = { "categoria": [categ]},
-            result = products.producto.filter(function (o) {
-                return Object.keys(filterBy).every(function (k) {
-                    return filterBy[k].some(function (f) {
-                        return o[k] === f;
-                    });
-                });   
+            filterBy = { "categoria": categ, "precioMayor": precioMayor, "precioMenor": precioMenor, "disponibilidad": disp},
+            result = products.producto.filter(function (productoActual) {
+                if (productoActual.categoria === filterBy.categoria || 
+                    (productoActual.precio < filterBy.precioMayor && productoActual.precio > filterBy.precioMenor)
+                    || (productoActual.cantidadDisponible > 0 && filterBy.disponibilidad)){
+                        return true;
+                    }
             });
         
          
@@ -114,7 +115,7 @@ router.get('/catalogo/productos/', async (req, res) => {
                 return result;
             } else {
                 console.log(result);
-                result= products;
+                result = products;
             }
         })
         .catch(function(err){
@@ -135,21 +136,25 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
     console.log('its me again');
        
     try{
-        var cate = [];
-        const test = await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
+        
+        let categoria = [];
+        const test = await  fetch('http://localhost:8080/Inventario/getCategoriaAll').then(function(response) {
             return response.json();
         })
         .then(response=>{
-            response.producto.forEach(element=>{
-                cate += element.categoria + ',';
+            response.categorias.forEach(element=>{
+                console.log(element.categoria)
+                categoria.push(                     
+                    element.categoria                
+                );
             })
-            console.log('CATE=', cate);
-            return cate;
+            console.log('CATE=', categoria);
+            return categoria;
         })
         .catch(function(err){
             console.log(err);
         });
-        res.json(cate);
+        res.json(categoria);
     }
     catch (error) {
         res.send(error);
@@ -159,33 +164,32 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
 
 router.get('/catalogo/productos/rango', async (req, res) => {
     console.log('its me again');
-    var precio = 0;
-    var precioMenor = 0;
-    var precioMayor = 0;
+    var precio;
+    var precioMenor;
+    var precioMayor;
     var ret = "";
-    console.log(precioMenor, precioMayor);
+    var cont = 0;
     try{
         var rango = [];
         const test = await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
             return response.json();
         })
         .then(response=>{
-            precioMenor = response.producto[0].precio;
-            console.log('CATE=', precioMenor);
-            precioMayor = response.producto[0].precio;
-            console.log('CATE=', precioMayor);
+            precioMenor = parseInt(response.producto[0].precio);
+            //console.log('CATE=', precioMenor);
+            precioMayor = parseInt(response.producto[0].precio);
+            //console.log('CATE=', precioMayor);
             response.producto.forEach(element=>{
-                //cate += element.categoria + ',';
-                precio = element.precio;
-                console.log('algo=', precio);
-                if (precioMenor > precio){
+                precio = parseInt(element.precio);
+                console.log('CATE=', response);
+                if (precio < precioMenor){
                   precioMenor = precio;
-                } else if (precioMayor < precio){
+                  console.log(precio);
+                } else if (precio > precioMayor){
                   precioMayor = precio;
                 }
             })
-            rango += precioMenor + ',' + precioMayor;
-            
+            rango = {precioMenor, precioMayor};
             return rango;
         })
         .catch(function(err){
