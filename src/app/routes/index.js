@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const producto = require('../model/producto');
 const fetch = require('node-fetch')
+//var request = require('request');
 //var getJSON = require('get-json')
 //const mongoose = require('mongoose');
 //var fs = require('fs');
@@ -62,11 +63,14 @@ var catalogo = [{
 
 
 
-//localhost:4000/productos
 router.get('/catalogo/productos/', async (req, res) => {
     console.log("file");   
+    precioMenor = req.query.from;
+    precioMenor = req.query.to;
+    categ = req.query.categ;
+    console.log(categ);
+    let result;
     try{
-
         
         const productos = await producto.find({});        
         let products ={producto: []};;
@@ -93,17 +97,36 @@ router.get('/catalogo/productos/', async (req, res) => {
                     
                     
             })
-            console.log(products);
-            return products;
+            console.log(categ);
+            
+            filterBy = { "categoria": [categ]},
+            result = products.producto.filter(function (o) {
+                return Object.keys(filterBy).every(function (k) {
+                    return filterBy[k].some(function (f) {
+                        return o[k] === f;
+                    });
+                });   
+            });
+        
+         
+            if(result.length>0){
+                console.log(result);
+                return result;
+            } else {
+                console.log(result);
+                result= products;
+            }
         })
         .catch(function(err){
             console.log(err);
         });
-        res.json(products);
-    } catch (error) {
+        res.json(result);
+     } catch (error) {
         res.send(error);
     }
 });
+
+
 
 
 
@@ -174,7 +197,7 @@ router.get('/catalogo/productos/rango', async (req, res) => {
     }
 });
 
-
+/*
 //localhost:4000/producto/precio?from=####&to=####
 //localhost:4000/productos/precio?from=####&to=####
 router.get('/catalogo/productos/par', async (req, res) => {
@@ -228,6 +251,8 @@ router.get('/catalogo/productos/par', async (req, res) => {
         res.send(error);
     }
 });
+
+*/
 
 //localhost:4000/producto/id/""""
 router.get('/catalogo/productos/:id', async (req, res) => {
