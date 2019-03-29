@@ -3,9 +3,12 @@ const express = require('express');
 bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv')
 
 
 const app = express();
+
+dotenv.config();
 
 mongoose.connect('mongodb://localhost/producto')
   .then(db => console.log('db connected'))
@@ -25,5 +28,8 @@ app.use('/', indexRoutes);
 
 //starting the server
 app.listen(app.get('port'), () => {
-	console.log(`server on port ${app.get('port')}`);
+  console.log(`server on port ${app.get('port')}`);  
+  console.log(process.env.ROOT)
 });
+
+module.exports = app;

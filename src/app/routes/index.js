@@ -64,17 +64,15 @@ var catalogo = [{
 
 
 router.get('/catalogo/productos/', async (req, res) => {
-    console.log("file");   
     precioMenor = req.query.from ? req.query.from : 0;
     precioMayor= req.query.to ? req.query.to :0;
     categ = req.query.categ ? req.query.categ :0; 
     disp= req.query.disp? req.query.disp:0; 
-    console.log(categ);
     let result;
     try{
         
         const productos = await producto.find({});        
-        let products ={producto: []};;
+        let products ={producto: []};
         const test = await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
             return response.json();
         })
@@ -111,17 +109,15 @@ router.get('/catalogo/productos/', async (req, res) => {
         
          
             if(result.length>0){
-                console.log(result);
-                return result;
+                products.producto =  result;
             } else {
-                console.log(result);
                 result = products;
             }
         })
         .catch(function(err){
             console.log(err);
         });
-        res.json(result);
+        res.json(products);
      } catch (error) {
         res.send(error);
     }
@@ -133,28 +129,24 @@ router.get('/catalogo/productos/', async (req, res) => {
 
 //localhost:4000/producto/categoria/""""
 router.get('/catalogo/productos/categorias', async (req, res) => {
-    console.log('its me again');
        
     try{
         
         let categoria = [];
-        const test = await  fetch('http://localhost:8080/Inventario/getCategoriaAll').then(function(response) {
+        const test = await  fetch('http://localhost:8080/Inventario/getCategoriaAll')
+        .then(function(response) {
             return response.json();
         })
         .then(response=>{
             response.categorias.forEach(element=>{
-                console.log(element.categoria)
-                categoria.push(                     
-                    element.categoria                
-                );
+                categoria.push(element.categoria);
             })
-            console.log('CATE=', categoria);
             return categoria;
         })
         .catch(function(err){
             console.log(err);
         });
-        res.json(categoria);
+        res.json({categoria});
     }
     catch (error) {
         res.send(error);
@@ -163,7 +155,6 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
 
 
 router.get('/catalogo/productos/rango', async (req, res) => {
-    console.log('its me again');
     var precio;
     var precioMenor;
     var precioMayor;
@@ -176,15 +167,11 @@ router.get('/catalogo/productos/rango', async (req, res) => {
         })
         .then(response=>{
             precioMenor = parseInt(response.producto[0].precio);
-            //console.log('CATE=', precioMenor);
             precioMayor = parseInt(response.producto[0].precio);
-            //console.log('CATE=', precioMayor);
             response.producto.forEach(element=>{
                 precio = parseInt(element.precio);
-                console.log('CATE=', response);
                 if (precio < precioMenor){
                   precioMenor = precio;
-                  console.log(precio);
                 } else if (precio > precioMayor){
                   precioMayor = precio;
                 }
@@ -201,70 +188,11 @@ router.get('/catalogo/productos/rango', async (req, res) => {
     }
 });
 
-/*
-//localhost:4000/producto/precio?from=####&to=####
-//localhost:4000/productos/precio?from=####&to=####
-router.get('/catalogo/productos/par', async (req, res) => {
-    console.log('its me again');
-    var precioMenor = req.query.from;
-    console.log(precioMenor);
-    var precioMayor = req.query.to;
-    console.log(precioMayor);
-    var categoria = req.query.cat;
-    console.log(categoria);
-    var disp = req.query.disp;
-    console.log(disp);
-    var cont = 0;
-    var ret = "";
-    
-    //console.log(precioMenor, precioMayor);
-    try{
-        const productos = await producto.find({});        
-        let products ={producto: []};;
-        const test = await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
-            return response.json();
-        })
-        .then(response=>{
-            response.producto.forEach(element=>{
-                const productFound = productos.filter(value => value.idProducto === element.idProducto)
-                if(productFound.length > 0) {
-                    element.imagen = productFound[0].imagen;
-                    element.miniatura = productFound[0].miniatura;
-                    
-                        products.producto.push({ 
-                            "idProducto": element.idProducto,
-                            "categoria": element.categoria,
-                            "cantidadDisponible": element.cantidadDisponible,
-                            "precio": element.precio,
-                            "descripcion": element.descripcion,
-                            "imagen": element.imagen,
-                            "miniatura": element.miniatura                        
-                        });
-                    }
-                    
-                    
-            })
-            console.log(products);
-            return products;
-        })
-        .catch(function(err){
-            console.log(err);
-        });
-        res.json(products);
-    } catch (error) {
-        res.send(error);
-    }
-});
-
-*/
-
 //localhost:4000/producto/id/""""
 router.get('/catalogo/productos/:id', async (req, res) => {
-    console.log('its me');
-    //console.log(JSON.stringify(catalogo));
+    var validar = 0;
     try{
-        var id = req.params.id;
-        //var cont = 0;
+        const id = req.params.id;
         console.log(id);
         const productos = await producto.find({idProducto: id});
 
@@ -278,7 +206,6 @@ router.get('/catalogo/productos/:id', async (req, res) => {
             miniatura: ""
         };
 
-        let products = [];
         const test = await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
             return response.json();
         })
@@ -294,16 +221,20 @@ router.get('/catalogo/productos/:id', async (req, res) => {
                         imagen: productos[0].imagen,
                         miniatura: productos[0].miniatura
                     };
+                    validar = 1;
+                    Console.log("Estoy intentando")
                 }
             })
-
-            console.log(data);
-            return data;
         })
         .catch(function(err){
             console.log(err);
         });
+        console.log(validar)
+        if (validar != 1) {
+            res.status(400).send({ error: "Producto no encontrado." });
+        } else {
         res.json(data);      
+        }
     }        
     catch (error) {
         res.send(error);
