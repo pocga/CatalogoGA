@@ -4,6 +4,7 @@ bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv')
+const cors = require('cors')
 
 
 const app = express();
@@ -19,9 +20,12 @@ const indexRoutes = require('./app/routes/index')
 app.set('port', process.env.PORT || 4000);
 app.set('views', path.join(__dirname, 'views'));
 
+
+
 //middlewares
+app.use(cors());
 app.use(morgan('development'));
-app.use(express.urlencoded({extended: false}))
+app.use(express.urlencoded({extended: false}));
 
 // routes
 app.use('/', indexRoutes);
