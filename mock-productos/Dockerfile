@@ -1,4 +1,4 @@
-FROM tomcat:8.5
+FROM pocga/tomcat:latest
 
 WORKDIR /home/node/app
 

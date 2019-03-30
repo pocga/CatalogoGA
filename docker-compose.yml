@@ -9,7 +9,7 @@ services:
     environment:
       - MONGO_HOST=mongodb
       - MONGO_PORT=27017
-      - MOCK_URL=http://mockproductos:8090/ProductosMock/AllProductos
+      - MOCK_URL=http://mockproductos:8080/ProductosMock/AllProductos
     links: 
       - mongodb
     depends_on:
