@@ -59,8 +59,7 @@ var catalogo = [{
 }];
 
 
-
-
+const mockUrl= process.env.MOCK_URL
 
 
 router.get('/catalogo/productos/', async (req, res) => {
@@ -73,7 +72,7 @@ router.get('/catalogo/productos/', async (req, res) => {
         
         const productos = await producto.find({});        
         let products ={producto: []};
-        const test = await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
+        const test = await  fetch(mockUrl).then(function(response) {
             return response.json();
         })
         .then(response=>{
@@ -133,7 +132,7 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
     try{
         
         let categoria = [];
-        const test = await  fetch('http://localhost:8080/Inventario/getCategoriaAll')
+        const test = await  fetch(mockUrl)
         .then(function(response) {
             return response.json();
         })
@@ -162,7 +161,7 @@ router.get('/catalogo/productos/rango', async (req, res) => {
     var cont = 0;
     try{
         var rango = [];
-        const test = await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
+        const test = await  fetch(mockUrl).then(function(response) {
             return response.json();
         })
         .then(response=>{
@@ -206,7 +205,7 @@ router.get('/catalogo/productos/:id', async (req, res) => {
             miniatura: ""
         };
 
-        const test = await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
+        const test = await  fetch(mockUrl).then(function(response) {
             return response.json();
         })
         .then(response=>{
@@ -240,12 +239,5 @@ router.get('/catalogo/productos/:id', async (req, res) => {
         res.send(error);
     }
 });
-
-
-
-
-
-
-
 
 module.exports = router;

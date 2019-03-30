@@ -1,0 +1,107 @@
+[
+    {
+        "idProducto" : "C001",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Celulares/AppleIphone8_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Celulares/AppleIphone8_160.png"
+    },
+    {
+        "idProducto" : "C002",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Celulares/AppleIphoneX_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Celulares/AppleIphoneX_160.png"
+    },
+    {
+        "idProducto" : "C003",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Celulares/HuaweiP10_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Celulares/HuaweiP10_160.png"
+    },
+    {
+        "idProducto" : "C004",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Celulares/HuaweiY9_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Celulares/HuaweiY9_160.png"
+    },
+    {
+        "idProducto" : "C005",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Celulares/SamsungGalaxyJ8_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Celulares/SamsungGalaxyJ8_160.png"
+    },
+    {
+        "idProducto" : "C006",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Celulares/SamsungGalaxys9_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Celulares/SamsungGalaxys9_160.png"
+    },
+    {
+        "idProducto" : "P001",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilDell_3467_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilDell_3467_160.png"
+    },
+    {
+        "idProducto" : "P002",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilDell_XPS9370_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilDell_XPS9370_160.png"
+    },
+    {
+        "idProducto" : "P003",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilHP_250_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilHP_250_160.png"
+    },
+    {
+        "idProducto" : "P004",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilHP_AX022_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilHP_AX022_160.png"
+    },
+    {
+        "idProducto" : "P005",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilSamsung_Notebook7_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilSamsung_Notebook7_160.png"
+    },
+    {
+        "idProducto" : "P006",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilSamsung_Notebook9_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Portatiles/PortatilSamsung_Notebook9_160.png"
+    },
+    {
+        "idProducto" : "T3600550",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/AOC_32 pulgadas_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/AOC_32 pulgadas_160.png"
+    },
+    {
+        "idProducto" : "T3600551",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/AOC_50pulgadas_400.jpg",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/AOC_50pulgadas_160.png"
+    },
+    {
+        "idProducto" : "T3600547",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/LG_ SmartV_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/LG_ SmartV_160.png"
+    },
+    {
+        "idProducto" : "T3600548",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/LG_65Pulgadas_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/LG_65pulgadas_160.png"
+    },
+    {
+        "idProducto" : "T3600544",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/LG_UltraHD_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/LG_UltraHD_160.png"
+    },
+    {
+        "idProducto" : "T3600545",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/Samsung_43Pulgadas_400.jpg",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/Samsung_43Pulgadas_160.png"
+    },
+    {
+        "idProducto" : "T3600543",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/Samsung_55Pulgadas_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/samsung_55Pulgadas_160.png"
+    },
+    {
+        "idProducto" : "T3600546",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/Samsung_QledTV_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/Samsung_QledTV_160.png"
+    },
+    {
+        "idProducto" : "T3600549",
+        "imagen" : "https://s3.amazonaws.com/techstorega-images/Televisores/Samsung_Smartv_400.png",
+        "miniatura" : "https://s3.amazonaws.com/techstorega-images/Televisores/Samsung_Smartv_160.png"
+    }
+]

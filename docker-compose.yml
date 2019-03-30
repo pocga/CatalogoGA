@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  pedidosga:
+    image: pocga/catalogoga
+    ports:
+     - 4000:4000
+    environment:
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MOCK_URL='http://localhost:8090/ProductosMock/AllProductos'
+    links: 
+      - mongodb
+    depends_on:
+      - mongodb
+      - mongoseed
+    container_name: catalogoga-compose
+
+  mongodb:
+    image: mongo
+    container_name: mongo-compose
+    ports:
+      - "27017:27017"
+
+  mongoseed:
+    image: pocga/mongoseed
+    container_name: mongoseed-compose
+    links:
+      - mongodb
+

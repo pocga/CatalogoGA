@@ -11,7 +11,9 @@ const app = express();
 
 dotenv.config();
 
-mongoose.connect('mongodb://localhost/producto')
+console.log(`puerto mongo:${process.env.MONGO_HOST}`);
+
+mongoose.connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/producto`)
   .then(db => console.log('db connected'))
   .catch(err => console.log(err));
 const indexRoutes = require('./app/routes/index')
