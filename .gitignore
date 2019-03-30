@@ -10,6 +10,9 @@ logs
 *.log
 npm-debug.log*
 
+# war files
+*.war
+
 # Runtime data
 pids
 *.pid

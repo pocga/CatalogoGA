@@ -60,6 +60,7 @@ var catalogo = [{
 
 
 const mockUrl= process.env.MOCK_URL
+console.log(`esta es la url dl mock ${process.env.MOCK_URL}`);
 
 
 router.get('/catalogo/productos/', async (req, res) => {
