@@ -8,6 +8,4 @@ const ProductoSchema = Schema({
   miniatura: String
 });
 
-
-
 module.exports = mongoose.model('producto', ProductoSchema);
