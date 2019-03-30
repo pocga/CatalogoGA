@@ -1,23 +1,25 @@
-const path = require('path');
-const express = require('express');
-bodyParser = require('body-parser');
-const morgan = require('morgan');
-const mongoose = require('mongoose');
+const path = require('path'),
+      express = require('express'),
+      morgan = require('morgan'),
+      mongoose = require('mongoose'),
+      dotenv = require('dotenv');
 
 
 const app = express();
 
-mongoose.connect('mongodb://localhost/producto')
+dotenv.config();
+
+mongoose.connect(process.env.MONGO_ROUTE)
   .then(db => console.log('db connected'))
   .catch(err => console.log(err));
 const indexRoutes = require('./app/routes/index')
 
 //settings
-app.set('port', process.env.PORT || 4000);
+app.set('port', process.env.PORT);
 app.set('views', path.join(__dirname, 'views'));
 
 //middlewares
-app.use(morgan('development'));
+app.use(morgan(process.env.MOR_DEV));
 app.use(express.urlencoded({extended: false}))
 
 // routes
@@ -25,5 +27,7 @@ app.use('/', indexRoutes);
 
 //starting the server
 app.listen(app.get('port'), () => {
-	console.log(`server on port ${app.get('port')}`);
+  console.log(`server on port ${app.get('port')}`);  
 });
+
+module.exports = app;
