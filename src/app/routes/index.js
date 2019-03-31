@@ -16,6 +16,7 @@ const express = require('express'),
 //localhost:4000/catalogo/catalogo/productos?categ="""" -> Consulta por categoria
 //localhost:4000/catalogo/catalogo/productos?disp=true/false -> Consulta por disponibilidad
 router.get('/catalogo/productos/', async (req, res) => {
+    
     const sendresponse = option => res.end(option);
     precioMenor = req.query.from ? req.query.from : 0;
     precioMayor= req.query.to ? req.query.to :0;
@@ -23,22 +24,18 @@ router.get('/catalogo/productos/', async (req, res) => {
     disp= req.query.disp? req.query.disp:0; 
     let result;
     var valor =true;
-    var cadena = "";
-    try{
-        
-        var rediskey = `categ-${categ}precioMenor-${precioMenor}precioMayor-${precioMayor}disponibilidad-${disp}.`;
-      
 
+    try{
+
+        var rediskey = `categ-${categ}precioMenor-${precioMenor}precioMayor-${precioMayor}disponibilidad-${disp}.`;
         client.get(rediskey, function (error, result) {
             if (error) {
                 console.log(error);
                 throw error;
             }
             if (result === null){
-                console.log('result is: ',result);
-            
-            } else {
-                console.log('por fa')
+                console.log('result is: ',result);            
+            } else {                
                 valor = false;
                 sendresponse(result);
             }
@@ -48,7 +45,7 @@ router.get('/catalogo/productos/', async (req, res) => {
         {
         const productos = await producto.find({});        
         let products ={producto: []};
-        await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
+        await  fetch(process.env.MOCKP_ROUTE).then(function(response) {
             return response.json();
         })
         .then(response=>{
@@ -72,10 +69,7 @@ router.get('/catalogo/productos/', async (req, res) => {
                     
             })
 
-            console.log(catarray, parseInt(precioMenor), parseInt(precioMayor), String(disp));
-            var str = String(categ)
             var catarray = categ ? categ.split(",") : categ;
-            console.log(parseInt(precioMayor));
             var isWithinCategory = function(filterCateg, currentCategory)
             {
                 for (i = 0; i < filterCateg.length; i++) {
@@ -105,21 +99,19 @@ router.get('/catalogo/productos/', async (req, res) => {
         })
         .catch(function(err){
             console.log(err);
-        });
-     
-        
+        });    
     }   
-    
-     } catch (error) {
+    } catch (error) {
         sendresponse(error);
     }
 });
 
 //localhost:4000/catalogo/productos/categorias/
 router.get('/catalogo/productos/categorias', async (req, res) => {
+    
     const sendresponse = option => res.end(option);
-
     var valor=true;
+
     try{
         client.get('/catalogo/productos/categorias', function (error, result) {
             if (error) {
@@ -135,17 +127,14 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
             }
         });
         if (valor===true)
-        {
-            //let categoria = [];       
-            await  fetch('http://localhost:8080/Inventario/getCategoriaAll')
+        {    
+            await  fetch(process.env.MOCKC_ROUTE)
                 .then(function(response) {
                     return response.json();
                 })
                 .then(response=>{
-                    //console.log(JSON.stringify(categoria))
                     client.setex('/catalogo/productos/categorias', 30, JSON.stringify(response), redis.print);
                     sendresponse(JSON.stringify(response));
-                    //return response.json();
                 })
                 .catch(function(err){
                     console.log(err);
@@ -159,12 +148,15 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
 
 //localhost:4000/catalogo/productos/rango/
 router.get('/catalogo/productos/rango', async (req, res) => {
+
     const sendresponse = option => res.end(option);
     var precio;
     var precioMenor;
     var precioMayor;
     valor =true;
+
     try{
+
         client.get('/catalogo/productos/rango', function (error, result) {
             if (error) {
                 console.log(error);
@@ -174,14 +166,13 @@ router.get('/catalogo/productos/rango', async (req, res) => {
                 console.log('result is: ',result);
             } else {
                 valor = false;
-                console.log("Ahi vamos viendo");
                 sendresponse(result);
             }
         });
 
         if (valor === true) {
             var rango = [];
-            await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
+            await  fetch(process.env.MOCKP_ROUTE).then(function(response) {
                 return response.json();
             })
             .then(response=>{
@@ -201,9 +192,9 @@ router.get('/catalogo/productos/rango', async (req, res) => {
             })
             .catch(function(err){
                 console.log(err);
-            });
-            
+            });            
         }
+
     } catch (error) {
         sendresponse(error);
     }
@@ -211,10 +202,11 @@ router.get('/catalogo/productos/rango', async (req, res) => {
 
 //localhost:4000/alogo/productos/""""
 router.get('/catalogo/productos/:id', async (req, res) => {
+    
     var validar = 0;
+
     try{
         const id = req.params.id;
-        console.log(id);
         const productos = await producto.find({idProducto: id});
 
         var data = {
@@ -227,7 +219,7 @@ router.get('/catalogo/productos/:id', async (req, res) => {
             miniatura: ""
         };
 
-        await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
+        await  fetch(process.env.MOCKP_ROUTE).then(function(response) {
             return response.json();
         })
         .then(response=>{
