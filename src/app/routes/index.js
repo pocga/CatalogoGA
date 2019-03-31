@@ -25,7 +25,7 @@ router.get('/catalogo/productos/', async (req, res) => {
     var cadena = "";
     try{
         
-        var rediskey = `categ-${String(categ)}precioMenor-${parseInt(precioMenor)}precioMayor-${parseInt(precioMayor)}disponibilidad-${String(disp)}.`
+        var rediskey = `categ-${categ}precioMenor-${precioMenor}precioMayor-${precioMayor}disponibilidad-${disp}.`;
       
 
         client.get(rediskey, function (error, result) {
@@ -47,7 +47,6 @@ router.get('/catalogo/productos/', async (req, res) => {
         {
         const productos = await producto.find({});        
         let products ={producto: []};
-        let products2;
         await  fetch('http://localhost:8080/Inventario/getProductoAll').then(function(response) {
             return response.json();
         })
@@ -96,8 +95,9 @@ router.get('/catalogo/productos/', async (req, res) => {
                     : (String(filterBy.disponibilidad) === "false" ? parseInt(productoActual.cantidadDisponible) === 0 : false)) : true)) {
 	                return true;
             }
-            });            
-            products = result;
+            });        
+
+            products.producto = result;
             client.setex(rediskey, 30, JSON.stringify(products), redis.print);
             } 
                                   
@@ -116,9 +116,12 @@ router.get('/catalogo/productos/', async (req, res) => {
 
 //localhost:4000/catalogo/productos/categorias/
 router.get('/catalogo/productos/categorias', async (req, res) => {
+    const sendresponse = option => res.send(option);
 
     var valor=true;
     try{
+
+        
 
         client.get('/catalogo/productos/categorias', function (error, result) {
             if (error) {
@@ -130,32 +133,30 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
             
             } else {
                 valor = false;
-                res.send(JSON.parse(result));
+                sendresponse(result);
             }
         });
-     
-    
+ 
+        if (valor===true)
         {
-        let categoria = [];       
+            //let categoria = [];       
             await  fetch('http://localhost:8080/Inventario/getCategoriaAll')
-            .then(function(response) {
-                return response.json();
-            })
-            .then(response=>{
-                response.categorias.forEach(element=>{
-                    categoria.push(element.categoria);
+                .then(function(response) {
+                    return response.json();
                 })
-                client.setex('/catalogo/productos/categorias', 30, JSON.stringify(categoria), redis.print);
-                return categoria;
-            })
-            .catch(function(err){
-                console.log(err);
-        });
-        res.json({categoria});
-    }
+                .then(response=>{
+                    //console.log(JSON.stringify(categoria))
+                    client.setex('/catalogo/productos/categorias', 30, JSON.stringify(response), redis.print);
+                    sendresponse(JSON.stringify(response));
+                    //return response.json();
+                })
+                .catch(function(err){
+                    console.log(err);
+            });
+        }
 }
     catch (error) {
-        res.send(error);
+        sendresponse(error);
     }
 });
 
