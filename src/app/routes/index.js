@@ -24,8 +24,27 @@ router.get('/catalogo/productos/', async (req, res) => {
     var valor =true;
     var cadena = "";
     try{
-        //cadena = `Categoria: ${String(categ)}, precioMenor: ${parseInt(precioMenor)}, precioMayor: ${parseInt(precioMayor)}, disponibilidad: ${String(disp)}.`
         
+        var rediskey = `categ-${String(categ)}precioMenor-${parseInt(precioMenor)}precioMayor-${parseInt(precioMayor)}disponibilidad-${String(disp)}.`
+      
+
+        client.get(rediskey, function (error, result) {
+            if (error) {
+                console.log(error);
+                throw error;
+            }
+            if (result === null){
+                console.log('result is: ',result);
+            
+            } else {
+                console.log('por fa')
+                valor = false;
+                res.send(JSON.parse(result));
+            }
+        });
+
+        if (valor === true)
+        {
         const productos = await producto.find({});        
         let products ={producto: []};
         let products2;
@@ -68,8 +87,7 @@ router.get('/catalogo/productos/', async (req, res) => {
             }
             result = products.product;
             if (catarray.length>0 || parseInt(precioMenor) !== 0 || parseInt(precioMayor) !== 0 || String(disp) !== "0"){
-                console.log('Esto es lo que tiene que imprimir: ',catarray ? 'set' : 'unset');
-                filterBy = { "categoria": catarray, "precioMayor": precioMayor, "precioMenor": precioMenor, "disponibilidad": disp},
+            filterBy = { "categoria": catarray, "precioMayor": precioMayor, "precioMenor": precioMenor, "disponibilidad": disp},
             result = products.producto.filter(function (productoActual) {
                 if ((catarray ? isWithinCategory(catarray, productoActual.categoria) : true) &&
                     (filterBy.precioMayor ? parseInt(productoActual.precio) <= filterBy.precioMayor : true) && 
@@ -78,11 +96,9 @@ router.get('/catalogo/productos/', async (req, res) => {
                     : (String(filterBy.disponibilidad) === "false" ? parseInt(productoActual.cantidadDisponible) === 0 : false)) : true)) {
 	                return true;
             }
-            });
-            client.setex('mensaje', 30, cadena, redis.print);
-            //console.log(result);
+            });            
             products = result;
-            client.setex("${String(categ)${parseInt(precioMenor)}{parseInt(precioMayor)}{String(disp)}", 30, JSON.stringify(products), redis.print);
+            client.setex(rediskey, 30, JSON.stringify(products), redis.print);
             } 
                                   
         })
@@ -91,7 +107,7 @@ router.get('/catalogo/productos/', async (req, res) => {
         });
      
         res.json(products);
-        
+    }   
     
      } catch (error) {
         res.send(error);
