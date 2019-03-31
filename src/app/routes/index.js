@@ -16,6 +16,7 @@ const express = require('express'),
 //localhost:4000/catalogo/catalogo/productos?categ="""" -> Consulta por categoria
 //localhost:4000/catalogo/catalogo/productos?disp=true/false -> Consulta por disponibilidad
 router.get('/catalogo/productos/', async (req, res) => {
+    const sendresponse = option => res.end(option);
     precioMenor = req.query.from ? req.query.from : 0;
     precioMayor= req.query.to ? req.query.to :0;
     categ = req.query.categ ? req.query.categ :0; 
@@ -39,7 +40,7 @@ router.get('/catalogo/productos/', async (req, res) => {
             } else {
                 console.log('por fa')
                 valor = false;
-                res.send(JSON.parse(result));
+                sendresponse(result);
             }
         });
 
@@ -96,33 +97,30 @@ router.get('/catalogo/productos/', async (req, res) => {
 	                return true;
             }
             });        
-
             products.producto = result;
             client.setex(rediskey, 30, JSON.stringify(products), redis.print);
             } 
+            sendresponse(JSON.stringify(products));
                                   
         })
         .catch(function(err){
             console.log(err);
         });
      
-        res.json(products);
+        
     }   
     
      } catch (error) {
-        res.send(error);
+        sendresponse(error);
     }
 });
 
 //localhost:4000/catalogo/productos/categorias/
 router.get('/catalogo/productos/categorias', async (req, res) => {
-    const sendresponse = option => res.send(option);
+    const sendresponse = option => res.end(option);
 
     var valor=true;
     try{
-
-        
-
         client.get('/catalogo/productos/categorias', function (error, result) {
             if (error) {
                 console.log(error);
@@ -136,7 +134,6 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
                 sendresponse(result);
             }
         });
- 
         if (valor===true)
         {
             //let categoria = [];       
@@ -162,12 +159,13 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
 
 //localhost:4000/catalogo/productos/rango/
 router.get('/catalogo/productos/rango', async (req, res) => {
+    const sendresponse = option => res.end(option);
     var precio;
     var precioMenor;
     var precioMayor;
     valor =true;
     try{
-        client.get('rango', function (error, result) {
+        client.get('/catalogo/productos/rango', function (error, result) {
             if (error) {
                 console.log(error);
                 throw error;
@@ -177,7 +175,7 @@ router.get('/catalogo/productos/rango', async (req, res) => {
             } else {
                 valor = false;
                 console.log("Ahi vamos viendo");
-                res.send(JSON.parse(result));
+                sendresponse(result);
             }
         });
 
@@ -198,16 +196,16 @@ router.get('/catalogo/productos/rango', async (req, res) => {
                     }
                 })
                 rango = {precioMenor, precioMayor};
-                client.setex('rango', 30, JSON.stringify(rango), redis.print);
-                return rango;
+                client.setex('/catalogo/productos/rango', 30, JSON.stringify(rango), redis.print);
+                sendresponse(JSON.stringify(rango));
             })
             .catch(function(err){
                 console.log(err);
             });
-            res.json(rango);
+            
         }
     } catch (error) {
-        res.send(error);
+        sendresponse(error);
     }
 });
 
