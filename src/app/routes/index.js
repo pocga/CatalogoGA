@@ -4,13 +4,16 @@ const express = require('express'),
     fetch = require('node-fetch'),
     redis = require('redis');
     
-    var client = redis.createClient(process.env.PORTRED, process.env.HOSTRED);
+var client = redis.createClient(process.env.PORTRED, process.env.HOSTRED);
+
+//Creating connection with redis
+client.on('connect', function() {
+    console.log('Redis client connected');
+});
+
     
-    //Creating connection with redis
-    client.on('connect', function() {
-        console.log('Redis client connected');
-    });
-    
+
+
 //localhost:4000/catalogo/catalogo/productos/
 //localhost:4000/catalogo/catalogo/productos?from=####&to=#### -> Consulta por rango
 //localhost:4000/catalogo/catalogo/productos?categ="""" -> Consulta por categoria
@@ -22,47 +25,45 @@ router.get('/catalogo/productos/', async (req, res) => {
     precioMayor= req.query.to ? req.query.to :0;
     categ = req.query.categ ? req.query.categ :0; 
     disp= req.query.disp? req.query.disp:0; 
-    let result;
+    let productsReturn;
     var valor =true;
 
     try{
 
         var rediskey = `categ-${categ}precioMenor-${precioMenor}precioMayor-${precioMayor}disponibilidad-${disp}.`;
-        client.get(rediskey, function (error, result) {
+        client.get(rediskey, function (error, redisFilter) {
             if (error) {
                 console.log(error);
                 throw error;
             }
-            if (result === null){
-                console.log('result is: ',result);            
-            } else {                
+            if (redisFilter !== null){
                 valor = false;
-                sendresponse(result);
+                sendresponse(redisFilter);
             }
         });
 
         if (valor === true)
         {
         const productos = await producto.find({});        
-        let products ={producto: []};
-        await  fetch(process.env.MOCKP_ROUTE).then(function(response) {
-            return response.json();
+        let productsList ={producto: []};
+        fetch(process.env.MOCKP_ROUTE).then(function(productosMock) {
+            return productosMock.json();
         })
-        .then(response=>{
-            response.producto.forEach(element=>{
-                const productFound = productos.filter(value => value.idProducto === element.idProducto)
+        .then(productosMock=>{
+            productosMock.producto.forEach(productoActualMock=>{
+                const productFound = productos.filter(value => value.idProducto === productoActualMock.idProducto)
                 if(productFound.length > 0) {
-                    element.imagen = productFound[0].imagen;
-                    element.miniatura = productFound[0].miniatura;
+                    productoActualMock.imagen = productFound[0].imagen;
+                    productoActualMock.miniatura = productFound[0].miniatura;
                     
-                        products.producto.push({ 
-                            "idProducto": element.idProducto,
-                            "categoria": element.categoria,
-                            "cantidadDisponible": element.cantidadDisponible,
-                            "precio": element.precio,
-                            "descripcion": element.descripcion,
-                            "imagen": element.imagen,
-                            "miniatura": element.miniatura                        
+                    productsList.producto.push({ 
+                            "idProducto": productoActualMock.idProducto,
+                            "categoria": productoActualMock.categoria,
+                            "cantidadDisponible": productoActualMock.cantidadDisponible,
+                            "precio": productoActualMock.precio,
+                            "descripcion": productoActualMock.descripcion,
+                            "imagen": productoActualMock.imagen,
+                            "miniatura": productoActualMock.miniatura                        
                         });
                     }
                     
@@ -79,10 +80,10 @@ router.get('/catalogo/productos/', async (req, res) => {
                 }
                 return false;
             }
-            result = products.product;
+            productsReturn = productsList.product;
             if (catarray.length>0 || parseInt(precioMenor) !== 0 || parseInt(precioMayor) !== 0 || String(disp) !== "0"){
             filterBy = { "categoria": catarray, "precioMayor": precioMayor, "precioMenor": precioMenor, "disponibilidad": disp},
-            result = products.producto.filter(function (productoActual) {
+            productsReturn = productsList.producto.filter(function (productoActual) {
                 if ((catarray ? isWithinCategory(catarray, productoActual.categoria) : true) &&
                     (filterBy.precioMayor ? parseInt(productoActual.precio) <= filterBy.precioMayor : true) && 
                     (filterBy.precioMenor ? parseInt(productoActual.precio) >= filterBy.precioMenor : true) &&
@@ -91,10 +92,10 @@ router.get('/catalogo/productos/', async (req, res) => {
 	                return true;
             }
             });        
-            products.producto = result;
-            client.setex(rediskey, 30, JSON.stringify(products), redis.print);
+            productsList.producto = productsReturn;
+            client.setex(rediskey, 30, JSON.stringify(productsList), redis.print);
             } 
-            sendresponse(JSON.stringify(products));
+            sendresponse(JSON.stringify(productsList));
                                   
         })
         .catch(function(err){
@@ -113,28 +114,26 @@ router.get('/catalogo/productos/categorias', async (req, res) => {
     var valor=true;
 
     try{
-        client.get('/catalogo/productos/categorias', function (error, result) {
+        client.get('/catalogo/productos/categorias', function (error, redisCategory) {
             if (error) {
                 console.log(error);
                 throw error;
             }
-            if (result === null){
-                console.log('result is: ',result);
-            
-            } else {
+            if (redisCategory !== null){                
                 valor = false;
-                sendresponse(result);
+                sendresponse(redisCategory);            
             }
         });
+
         if (valor===true)
         {    
-            await  fetch(process.env.MOCKC_ROUTE)
-                .then(function(response) {
-                    return response.json();
+            fetch(process.env.MOCKC_ROUTE)
+                .then(function(mockProductos) {
+                    return mockProductos.json();
                 })
-                .then(response=>{
-                    client.setex('/catalogo/productos/categorias', 30, JSON.stringify(response), redis.print);
-                    sendresponse(JSON.stringify(response));
+                .then(mockProductos=>{
+                    client.setex('/catalogo/productos/categorias', 30, JSON.stringify(mockProductos), redis.print);
+                    sendresponse(JSON.stringify(mockProductos));
                 })
                 .catch(function(err){
                     console.log(err);
@@ -157,38 +156,36 @@ router.get('/catalogo/productos/rango', async (req, res) => {
 
     try{
 
-        client.get('/catalogo/productos/rango', function (error, result) {
+        client.get('/catalogo/productos/rango', function (error, redisRange) {
             if (error) {
                 console.log(error);
                 throw error;
             }
-            if (result === null){
-                console.log('result is: ',result);
-            } else {
+            if (redisRange !== null){
                 valor = false;
-                sendresponse(result);
+                sendresponse(redisRange);
             }
         });
 
         if (valor === true) {
-            var rango = [];
-            await  fetch(process.env.MOCKP_ROUTE).then(function(response) {
-                return response.json();
+            var range = [];
+            fetch(process.env.MOCKP_ROUTE).then(function(mockProductos) {  
+            return mockProductos.json();
             })
-            .then(response=>{
-                precioMenor = parseInt(response.producto[0].precio);
-                precioMayor = parseInt(response.producto[0].precio);
-                response.producto.forEach(element=>{
-                    precio = parseInt(element.precio);
+            .then(mockProductos=>{
+                precioMenor = parseInt(mockProductos.producto[0].precio);
+                precioMayor = parseInt(mockProductos.producto[0].precio);
+                mockProductos.producto.forEach(productoActualMock=>{
+                    precio = parseInt(productoActualMock.precio);
                     if (precio < precioMenor){
                     precioMenor = precio;
                     } else if (precio > precioMayor){
                     precioMayor = precio;
                     }
                 })
-                rango = {precioMenor, precioMayor};
-                client.setex('/catalogo/productos/rango', 30, JSON.stringify(rango), redis.print);
-                sendresponse(JSON.stringify(rango));
+                range = {precioMenor, precioMayor};
+                client.setex('/catalogo/productos/rango', 30, JSON.stringify(range), redis.print);
+                sendresponse(JSON.stringify(range));
             })
             .catch(function(err){
                 console.log(err);
@@ -206,10 +203,9 @@ router.get('/catalogo/productos/:id', async (req, res) => {
     var validar = 0;
 
     try{
-        const id = req.params.id;
+        let id = req.params.id;
         const productos = await producto.find({idProducto: id});
-
-        var data = {
+        var productoPorId = {
             idProducto: "",
             categoria: "",
             cantidadDisponible: "",
@@ -219,33 +215,26 @@ router.get('/catalogo/productos/:id', async (req, res) => {
             miniatura: ""
         };
 
-        await  fetch(process.env.MOCKP_ROUTE).then(function(response) {
-            return response.json();
+        fetch(process.env.MOCKP_ROUTE).then(function(mockProductos) {  
+        return mockProductos.json();
         })
-        .then(response=>{
-            response.producto.forEach(element=>{
-                if (element.idProducto == id){
-                    data = {
-                        idProducto: element.idProducto,
-                        categoria: element.categoria,
-                        cantidadDisponible: element.cantidadDisponible,
-                        precio: element.precio,
-                        descripcion: element.descripcion,
-                        imagen: productos[0].imagen,
-                        miniatura: productos[0].miniatura
-                    };
-                    validar = 1;                    
-                }
-            })
+        .then(mockProductos=>{
+            let productFound = mockProductos.producto
+                              .filter(element => element.idProducto === String(id));
+            productFound = productFound.map(element => {
+                element['imagen'] = productos[0].imagen;
+                element['miniatura'] = productos[0].miniatura;
+                return element;
+            });
+            if (productFound.length <= 0) {
+                res.status(400).send({ error: "Producto no encontrado." });
+            } else {
+                res.send({productFound});      
+            }
         })
         .catch(function(err){
-            console.log(err);
+            res.json('Internal Error', err);
         });
-        if (validar != 1) {
-            res.status(400).send({ error: "Producto no encontrado." });
-        } else {
-        res.json(data);      
-        }
     }        
     catch (error) {
         res.send(error);
