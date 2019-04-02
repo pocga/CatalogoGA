@@ -2,7 +2,9 @@ const path = require('path'),
       express = require('express'),
       morgan = require('morgan'),
       mongoose = require('mongoose'),
+      errorMW = require('./app/middlewares/error.js')
       dotenv = require('dotenv');
+
 
 
 const app = express();
@@ -16,14 +18,21 @@ const indexRoutes = require('./app/routes/index')
 
 //settings
 app.set('port', process.env.PORT);
-app.set('views', path.join(__dirname, 'views'));
 
 //middlewares
-app.use(morgan(process.env.MOR_DEV));
+morgan.token('req-params', req => req.params);
+app.use(
+  morgan(
+    '[:date[clf]] :remote-addr - Request ":method :url" with params: :req-params. Response status: :status.'
+  )
+);
+
 app.use(express.urlencoded({extended: false}))
 
 // routes
 app.use('/', indexRoutes);
+
+app.use(errorMW.handle);
 
 //starting the server
 app.listen(app.get('port'), () => {

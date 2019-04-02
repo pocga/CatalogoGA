@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "development": "nodemon src/app.js",
+    "development": "nodemon --inspect src/app.js",
     "test": "mocha --exit"
   },
   "keywords": [],

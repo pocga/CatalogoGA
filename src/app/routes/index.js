@@ -147,12 +147,11 @@ router.get('/catalogo/productos/rango', async (req, res, next) => {
     var precioMenor;
     var precioMayor;
     var valor = true;
-    //var validar = 0;
+
 
     try{
 
         client.get('/catalogo/productos/rango', function (error, redisRange) {
-            let validar=0;
             if (error) {
                 console.log(error);
                 throw error;
@@ -191,35 +190,38 @@ router.get('/catalogo/productos/rango', async (req, res, next) => {
 });
 
 //localhost:4000/alogo/productos/""""
-router.get('/catalogo/productos/:id', async (req, res) => {
-    
-    try{
-        let id = req.params.id;
-        const productos = await producto.find({idProducto: id});
+router.get('/catalogo/productos/:id', async (req, res, next) => {
 
-        fetch(process.env.MOCKP_ROUTE).then(function(mockProductos) {  
-        return mockProductos.json();
-        })
-        .then(mockProductos=>{
-            let productFound = mockProductos.producto
-                              .filter(element => element.idProducto === String(id));
-            productFound = productFound.map(element => {
-                element['imagen'] = productos[0].imagen;
-                element['miniatura'] = productos[0].miniatura;
-                return element;
-            });
-            if (productFound.length <= 0) {
-                res.send({ error: "Producto no encontrado." });
-            } else {
-                res.send({productFound});      
-            }
-        })
-        .catch(function(err){
-            res.json('Internal Error', err);
-        });
+    const idProdBusqueda = req.params.id;
+
+    try{
+        
+        const productoMongo = await producto.find({idProducto: idProdBusqueda});
+        
+        if(productoMongo.length>1)
+            throw new Error("Err: La busqueda de mongo retorno más de un proucto");
+
+        fetch(process.env.MOCKP_ROUTE).then((mockReponse)=>mockReponse.json())
+            .then(mockData=>{
+
+                if(!mockData || !mockData.producto)
+                    throw new Error("Err: El mock no contiene datos de productos o no cumple el formato esperado")
+                
+                let productFound = mockData.producto.find(productoMock => productoMock.idProducto === idProdBusqueda);
+                
+                if (!productFound || productFound.length <= 0)
+                    throw new Error("Err: Producto no encontrado en API Catalogo Aval.");
+                
+                if(productoMongo.length){
+                    productFound.imagen = productoMongo[0].imagen;
+                    productFound.miniatura = productoMongo[0].miniatura;                
+                }
+                return productFound;
+
+            }).then(producto=>res.send(producto)).catch(next);
     }        
     catch (error) {
-        res.send(error);
+        next(error);
     }
 });
 
