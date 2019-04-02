@@ -46,7 +46,7 @@ router.get('/catalogo/productos/', async(req, res) => {
                     })
                     .then(productosMock => {
                         productosMock.producto.forEach(productoActualMock => {
-                            const productFound = productos.filter(value => parseInt(value.idProducto) === productoActualMock.idProducto)
+                            const productFound = productos.filter(value => parseInt(value.idProducto) === parseInt(productoActualMock.idProducto))
                             if (productFound.length > 0) {
                                 productoActualMock.imagen = productFound[0].imagen;
                                 productoActualMock.miniatura = productFound[0].miniatura;
@@ -78,10 +78,10 @@ router.get('/catalogo/productos/', async(req, res) => {
                             filterBy = { "categoria": catarray, "precioMayor": precioMayor, "precioMenor": precioMenor, "disponibilidad": disp },
                                 productsReturn = productsList.producto.filter(function(productoActual) {
                                     if ((catarray ? isWithinCategory(catarray, productoActual.categoria) : true) &&
-                                        (filterBy.precioMayor ? productoActual.precio <= parseInt(filterBy.precioMayor) : true) &&
-                                        (filterBy.precioMenor ? productoActual.precio >= parseInt(filterBy.precioMenor) : true) &&
-                                        (filterBy.disponibilidad ? (String(filterBy.disponibilidad) === "true" ? productoActual.cantidadDisponible > 0 :
-                                            (String(filterBy.disponibilidad) === "false" ? productoActual.cantidadDisponible === 0 : false)) : true)) {
+                                        (filterBy.precioMayor ? parseInt(productoActual.precio) <= parseInt(filterBy.precioMayor) : true) &&
+                                        (filterBy.precioMenor ? parseInt(productoActual.precio) >= parseInt(filterBy.precioMenor) : true) &&
+                                        (filterBy.disponibilidad ? (String(filterBy.disponibilidad) === "true" ? parseInt(productoActual.cantidadDisponible) > 0 :
+                                            (String(filterBy.disponibilidad) === "false" ? parseInt(productoActual.cantidadDisponible) === 0 : false)) : true)) {
                                         return true;
                                     }
                                 });
