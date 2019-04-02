@@ -26,7 +26,6 @@ router.get('/catalogo/productos/', async(req, res) => {
     precioMayor =  req.query.to  ?  req.query.to  : 0;
     categ  =  req.query.categ  ?  req.query.categ  : 0;
     disp =  req.query.disp ?  req.query.disp : 0;
-    id =  req.query.id ?  req.query.id : 0;
     let productsReturn;
     var valor = true;
 
@@ -79,8 +78,8 @@ router.get('/catalogo/productos/', async(req, res) => {
                             filterBy = { "categoria": catarray, "precioMayor": precioMayor, "precioMenor": precioMenor, "disponibilidad": disp },
                                 productsReturn = productsList.producto.filter(function(productoActual) {
                                     if ((catarray ? isWithinCategory(catarray, productoActual.categoria) : true) &&
-                                        (filterBy.precioMayor ? productoActual.precio <= filterBy.precioMayor : true) &&
-                                        (filterBy.precioMenor ? productoActual.precio >= filterBy.precioMenor : true) &&
+                                        (filterBy.precioMayor ? productoActual.precio <= parseInt(filterBy.precioMayor) : true) &&
+                                        (filterBy.precioMenor ? productoActual.precio >= parseInt(filterBy.precioMenor) : true) &&
                                         (filterBy.disponibilidad ? (String(filterBy.disponibilidad) === "true" ? productoActual.cantidadDisponible > 0 :
                                             (String(filterBy.disponibilidad) === "false" ? productoActual.cantidadDisponible === 0 : false)) : true)) {
                                         return true;
@@ -89,15 +88,7 @@ router.get('/catalogo/productos/', async(req, res) => {
                             productsList.producto = productsReturn;
                             client.setex(rediskey, 30, JSON.stringify(productsList), redis.print);
                         }
-                        if (String(id) !== "0") {
-                            filterBy = { "idProducto": String(id) },
-                                productsReturn = productsList.producto.filter(function(productoActual) {
-                                    if (productoActual.idProducto === filterBy.idProducto) {
-                                        return true;
-                                    }
-                                });
-                            productsList.producto = productsReturn;
-                        }
+
                         res.send(productsList);
 
                     })
