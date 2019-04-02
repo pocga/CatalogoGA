@@ -208,7 +208,7 @@ router.get('/catalogo/productos/:id', async(req, res, next) => {
                 if (!mockData || !mockData.producto)
                     throw error(constantes.MOCK_RES_ERR, "Err: El mock no contiene datos de productos o no cumple el formato esperado")
 
-                let productFound = mockData.producto.find(productoMock => productoMock.idProducto === idProdBusqueda);
+                let productFound = mockData.producto.find(productoMock => parseInt(productoMock.idProducto) === idProdBusqueda);
 
                 if (!productFound || productFound.length <= 0)
                     throw error(constantes.PROD_NO_ENC, "Err: Producto no encontrado en API Catalogo Aval.");
