@@ -209,7 +209,7 @@ router.get('/catalogo/productos/:id', async (req, res) => {
                 return element;
             });
             if (productFound.length <= 0) {
-                res.status(400).send({ error: "Producto no encontrado." });
+                res.status(404).send({ error: "Producto no encontrado." });
             } else {
                 res.send({productFound});      
             }
