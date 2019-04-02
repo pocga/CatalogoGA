@@ -1,225 +1,239 @@
-const express = require('express');
-const router = express.Router();
-const producto = require('../model/producto');
-const fetch = require('node-fetch')
-//var request = require('request');
-//var getJSON = require('get-json')
-//const mongoose = require('mongoose');
-//var fs = require('fs');
+const express = require('express'),
+    router = express.Router(),
+    producto = require('../model/producto'),
+    fetch = require('node-fetch'),
+    error = require('../errores/errores'),
+    constantes = require('../../constantes'),
+    redis = require('redis');
+    
+var client = redis.createClient(process.env.PORTRED, process.env.HOSTRED);
 
-//var data = fs.read('catalogo.json')
-//var catalogo = JSON.parse(data); 
-//var dataprod = JSON.stringify(productos, null, 2);
-//fs.writeFile('catalogo.json', productos, finished);
-
-var catalogo = [{
-    "idProducto": "001",
-    "categoria": "movil",
-    "cantidadDisponible": 20,
-    "precio": 15000,
-    "descripcion": "super bbb",
-    "imagen": "",
-    "miniatura": ""
-},
-{
-    "idProducto": "002",
-    "categoria": "tv",
-    "cantidadDisponible": 20,
-    "precio": 10000,
-    "descripcion": "super bbb",
-    "imagen": "",
-    "miniatura": ""
-},
-{
-    "idProducto": "000302",
-    "categoria": "tv",
-    "cantidadDisponible": 20,
-    "precio": 5000,
-    "descripcion": "super bbb",
-    "imagen": "",
-    "miniatura": ""
-}];
-
-
-
-
-
-
-//localhost:4000/productos
-router.get('/catalogo/productos', async (req, res) => {
-    console.log("file");
-
-    var test = await  fetch('http://localhost:8080/Inventario/getCategoriaAll').then(function(response) {
-        return response.json();
-        })
-        .then(function(myJson) {
-        return myJson;
-        })
-        .catch(function(err){
-            console.log(err);
-    });
-
-    console.log("Partamos de aca")
-    console.log(test);
-    console.log("quiza")
-
-    try{
-        const productos = await producto.find({});        
-        res.json(productos);
-        //console.log(myvariable + "funciono");
-    } catch (error) {
-        res.send(error);
-    }
+//Creating connection with redis
+client.on('connect', function() {
+    console.log('Redis client connected');
 });
-
-
-
-//localhost:4000/producto/categoria/""""
-router.get('/catalogo/productos/categorias', async (req, res) => {
-    console.log('its me again');
-    try{
-        var cate = [];
-         
-        for (i = 0; i < catalogo.length; i++){
-            cate[i] = catalogo[i].categoria;
-        }
-        console.log(cate);
-        let unique = [...new Set(cate)];
-        console.log(unique);
-        res.json(unique);
-        }
-    catch (error) {
-        res.send(error);
-    }
-});
-
-
-router.get('/catalogo/productos/rango', async (req, res) => {
-    console.log('its me again');
-    var precio = 0;
-    var precioMenor = 0;
-    var precioMayor = 0;
-    var ret = "";
-    console.log(precioMenor, precioMayor);
-    try{
-        precioMenor = catalogo[0].precio;
-        precioMayor = catalogo[0].precio;
-        console.log(precioMenor)
-        for (i = 0; i < catalogo.length; i++){
-            precio = catalogo[i].precio;
-            if (precioMenor > precio){
-                precioMenor = precio;
-            } else if (precioMayor < precio){
-                precioMayor = precio;
-            }
-        } 
-        //console.log(ret);
-        console.log(precioMenor);
-        console.log(precioMayor);
-        //console.log(cont);
-        var rango = {precioMayor, precioMenor}
-        res.json(rango);
-    } catch (error) {
-        res.send(error);
-    }
-});
-
-
-//localhost:4000/producto/precio?from=####&to=####
-//localhost:4000/productos/precio?from=####&to=####
-router.get('/catalogo/productos/precio', async (req, res) => {
-    console.log('its me again');
-    var precioMenor = req.query.from;
-    var precioMayor = req.query.to;
-    var cont = 0;
-    var ret = "";
-    console.log(precioMenor, precioMayor);
-    try{
-        for (i = 0; i < catalogo.length; i++){
-        if (catalogo[i].precio >= precioMenor && catalogo[i].precio <= precioMayor){
-            cont = cont + 1;
-            console.log(catalogo[i].idProducto);
-            //ret = ret + catalogo[i].idProducto;
-            var id = catalogo.idProducto;
-            const productos = await producto.find({idProducto: id});        
-            ret = ret + catalogo[i].idProducto + catalogo[i].categoria;
-            //ret = catalogo[i].idProducto + catalogo[i].categoria + catalogo[i].cantidadDisponible + catalogo[i].precio + catalogo[i].descripcion + productos[i].imagen + productos[i].miniatura
-            //catalogo[i].idProducto = productos.idProducto;
-            //catalogo[i].imagen = productos.imagen;
-            //catalogo[i].miniatura = productos.miniatura;
-        }         
-        } 
-        console.log(ret);
-        console.log(cont);
-        res.json(catalogo);
-    } catch (error) {
-        res.send(error);
-    }
-});
-
-//localhost:4000/producto/id/""""
-router.get('/catalogo/productos/:id', async (req, res) => {
-    console.log('its me');
-    //console.log(JSON.stringify(catalogo));
-    try{
-        var id = req.params.id;
-        var cont = 0;
-        console.log(id);
-            const productos = await producto.find({idProducto: id});
-            console.log(productos);
-            for (i = 0; i < catalogo.length; i++){
-                if (catalogo[i].idProducto == id){
-                    cont = i;
-                    break;
-                }
-            }
-            //console.log(catalogo[cont].idProducto)
-            var data = {
-                idProducto: catalogo[cont].idProducto,
-                categoria: catalogo[cont].categoria,
-                cantidadDisponible: catalogo[cont].cantidadDisponible,
-                precio: catalogo[cont].precio,
-                imagen: productos[0].imagen,
-                miniatura: productos[0].miniatura
-            };
-            res.json(data);      
-        }
-        
-    catch (error) {
-        res.send(error);
-    }
-});
-
-
-
-
-
-
-
-/*router.get('/producto/search/:id?', async (req, res, next) => {
-    console.log('its me');
-    try{
-        //console.log('missed me?');
-        //var id = req.params.id;   
-        //ObjectId.fromString(id);  
-        //console.log(producto);
-        //const productos = await producto.findById(id)
-        //res.json(productos);        
-        var id = "5c96ba61cff17c34d8464277";
-        producto.find({}, function(err, doc) { 
-            console.log(doc);
-            console.log(err);
-            return res.send(doc);
-        });
-    } catch (error) {
-        //res.send(error);
-        console.log(error);
-    }
 
     
 
 
-});*/
+//localhost:4000/catalogo/catalogo/productos/
+//localhost:4000/catalogo/catalogo/productos?from=####&to=#### -> Consulta por rango
+//localhost:4000/catalogo/catalogo/productos?categ="""" -> Consulta por categoria
+//localhost:4000/catalogo/catalogo/productos?disp=true/false -> Consulta por disponibilidad
+router.get('/catalogo/productos/', async (req, res) => {
+    
+    precioMenor = req.query.from ? req.query.from : 0;
+    precioMayor= req.query.to ? req.query.to :0;
+    categ = req.query.categ ? req.query.categ :0; 
+    disp= req.query.disp? req.query.disp:0; 
+    id= req.query.id? req.query.id:0; 
+    let productsReturn;
+    var valor =true;
 
+    try{
+
+        const productos = await producto.find({});
+        var rediskey = `categ-${categ}precioMenor-${precioMenor}precioMayor-${precioMayor}disponibilidad-${disp}.`;
+        client.get(rediskey, function (error, redisFilter) {
+            if (error) {
+                console.log(error);
+                throw error;
+            }
+            if (redisFilter === null){
+                        
+            let productsList ={producto: []};
+            fetch(process.env.MOCKP_ROUTE).then(function(productosMock) {
+                return productosMock.json();
+            })
+            .then(productosMock=>{
+                productosMock.producto.forEach(productoActualMock=>{
+                    const productFound = productos.filter(value => value.idProducto === productoActualMock.idProducto)
+                    if(productFound.length > 0) {
+                        productoActualMock.imagen = productFound[0].imagen;
+                        productoActualMock.miniatura = productFound[0].miniatura;
+                        
+                        productsList.producto.push({ 
+                                "idProducto": productoActualMock.idProducto,
+                                "categoria": productoActualMock.categoria,
+                                "cantidadDisponible": productoActualMock.cantidadDisponible,
+                                "precio": productoActualMock.precio,
+                                "descripcion": productoActualMock.descripcion,
+                                "imagen": productoActualMock.imagen,
+                                "miniatura": productoActualMock.miniatura                        
+                            });
+                        }
+                        
+                        
+                })
+                var catarray = categ ? categ.split(",") : categ;
+                var isWithinCategory = function(filterCateg, currentCategory)
+                {
+                    for (i = 0; i < filterCateg.length; i++) {
+                        if (currentCategory == filterCateg[i]) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                productsReturn = productsList.product;
+                if (catarray.length>0 || parseInt(precioMenor) !== 0 || parseInt(precioMayor) !== 0 || String(disp) !== "0"){
+                filterBy = { "categoria": catarray, "precioMayor": precioMayor, "precioMenor": precioMenor, "disponibilidad": disp},
+                productsReturn = productsList.producto.filter(function (productoActual) {
+                    if ((catarray ? isWithinCategory(catarray, productoActual.categoria) : true) &&
+                        (filterBy.precioMayor ? parseInt(productoActual.precio) <= filterBy.precioMayor : true) && 
+                        (filterBy.precioMenor ? parseInt(productoActual.precio) >= filterBy.precioMenor : true) &&
+                        (filterBy.disponibilidad ? (String(filterBy.disponibilidad) === "true" ? parseInt(productoActual.cantidadDisponible) > 0 
+                        : (String(filterBy.disponibilidad) === "false" ? parseInt(productoActual.cantidadDisponible) === 0 : false)) : true)) {
+                        return true;
+                }
+                });        
+                productsList.producto = productsReturn;
+                client.setex(rediskey, 30, JSON.stringify(productsList), redis.print);
+                } 
+                if (String(id) !== "0"){
+                    filterBy = {"idProducto": String(id)},
+                    productsReturn = productsList.producto.filter(function (productoActual) {
+                    if (productoActual.idProducto === filterBy.idProducto) {
+                        return true;
+                }
+                });   
+                productsList.producto = productsReturn;   
+                }
+                res.send(productsList);
+                                    
+            })
+            .catch(function(err){
+                console.log(err);
+            });
+                
+            } else {
+                res.send(JSON.parse(redisFilter));
+            }
+        });
+  
+    } catch (error) {
+        sendresponse(error);
+    }
+});
+
+//localhost:4000/catalogo/productos/categorias/
+router.get('/catalogo/productos/categorias', async (req, res) => {
+    
+    //const sendresponse = option => res.end(JSON.parse(JSON.stringify(option)));
+    try {
+        let valor = true;
+        client.get('/catalogo/productos/categorias', (error, redisCategory) => {
+            if (error) {
+                console.log(error);
+                throw error;
+            }
+            if (redisCategory === null){ 
+                fetch(process.env.MOCKC_ROUTE)
+                .then(function(mockProductos) {
+                    return mockProductos.json();
+                })
+                .then(mockProductos=>{
+                    client.setex('/catalogo/productos/categorias', 30, JSON.stringify(mockProductos), redis.print);
+                    res.send(mockProductos);
+                })
+                .catch(function(err){
+                    console.log(err);
+                });                  
+
+            } else {
+                valor = false; 
+                res.send(JSON.parse(redisCategory));            
+            }
+        })
+    } catch (error) {
+        res.send(error);
+    }
+
+});
+
+//localhost:4000/catalogo/productos/rango/
+router.get('/catalogo/productos/rango', async (req, res, next) => {
+
+    var precio;
+    var precioMenor;
+    var precioMayor;
+    var valor = true;
+
+
+    try{
+
+        client.get('/catalogo/productos/rango', function (error, redisRange) {
+            if (error) {
+                console.log(error);
+                throw error;
+            }
+            if (redisRange === null){
+                var range = [];
+            fetch(process.env.MOCKP_ROUTE).then(function(mockProductos) {  
+            return mockProductos.json();
+            })
+            .then(mockProductos=>{
+                precioMenor = parseInt(mockProductos.producto[0].precio);
+                precioMayor = parseInt(mockProductos.producto[0].precio);
+                mockProductos.producto.forEach(productoActualMock=>{
+                    precio = parseInt(productoActualMock.precio);
+                    if (precio < precioMenor){
+                    precioMenor = precio;
+                    } else if (precio > precioMayor){
+                    precioMayor = precio;
+                    }
+                })
+                range = {precioMenor, precioMayor};
+                client.setex('/catalogo/productos/rango', 30, JSON.stringify(range), redis.print);
+                res.send(range);
+            })
+            .catch(function(err){
+                console.log(err);
+            });
+                
+            } else {
+                res.send(JSON.parse(redisRange));
+            }
+        });
+    } catch (error) {
+        res.send(error);
+    }
+});
+
+//localhost:4000/alogo/productos/""""
+router.get('/catalogo/productos/:id', async (req, res, next) => {
+
+    const idProdBusqueda = req.params.id;
+
+    try{
+        
+        const productoMongo = await producto.find({idProducto: idProdBusqueda});
+        
+        if( productoMongo.length > 1 )
+            throw error(constantes.ERR_NEG_MONGO,"Err: La busqueda de mongo retorno más de un proucto");
+
+        fetch(process.env.MOCKP_ROUTE).then((mockReponse)=>mockReponse.json())
+            .then(mockData=>{
+
+                if(!mockData || !mockData.producto)
+                    throw error(constantes.MOCK_RES_ERR,"Err: El mock no contiene datos de productos o no cumple el formato esperado")
+                
+                let productFound = mockData.producto.find(productoMock => productoMock.idProducto === idProdBusqueda);
+                
+                if (!productFound || productFound.length <= 0)
+                    throw error(constantes.PROD_NO_ENC,"Err: Producto no encontrado en API Catalogo Aval.");
+                
+                if(productoMongo.length){
+                    productFound.imagen = productoMongo[0].imagen;
+                    productFound.miniatura = productoMongo[0].miniatura;                
+                }
+                return productFound;
+
+            }).then(producto=>res.send(producto)).catch(next);
+    }        
+    catch (err) {
+        next(error(constantes.GEN_ERROR,err));
+    }
+});
 
 module.exports = router;
