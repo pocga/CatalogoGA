@@ -2,7 +2,8 @@ const path = require('path'),
       express = require('express'),
       morgan = require('morgan'),
       mongoose = require('mongoose'),
-      errorMW = require('./app/middlewares/error.js')
+      errorMW = require('./app/middlewares/error.js'),
+      cors = require('cors'),
       dotenv = require('dotenv');
 
 
@@ -26,12 +27,11 @@ app.use(
     '[:date[clf]] :remote-addr - Request ":method :url" with params: :req-params. Response status: :status.'
   )
 );
-
+app.use(cors())
 app.use(express.urlencoded({extended: false}))
 
 // routes
 app.use('/', indexRoutes);
-
 app.use(errorMW.handle);
 
 //starting the server

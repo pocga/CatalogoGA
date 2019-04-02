@@ -2,6 +2,8 @@ const express = require('express'),
     router = express.Router(),
     producto = require('../model/producto'),
     fetch = require('node-fetch'),
+    error = require('../errores/errores'),
+    constantes = require('../../constantes'),
     redis = require('redis');
     
 var client = redis.createClient(process.env.PORTRED, process.env.HOSTRED);
@@ -207,19 +209,19 @@ router.get('/catalogo/productos/:id', async (req, res, next) => {
         
         const productoMongo = await producto.find({idProducto: idProdBusqueda});
         
-        if(productoMongo.length>1)
-            throw new Error("Err: La busqueda de mongo retorno más de un proucto");
+        if( productoMongo.length > 1 )
+            throw error(constantes.ERR_NEG_MONGO,"Err: La busqueda de mongo retorno más de un proucto");
 
         fetch(process.env.MOCKP_ROUTE).then((mockReponse)=>mockReponse.json())
             .then(mockData=>{
 
                 if(!mockData || !mockData.producto)
-                    throw new Error("Err: El mock no contiene datos de productos o no cumple el formato esperado")
+                    throw error(constantes.MOCK_RES_ERR,"Err: El mock no contiene datos de productos o no cumple el formato esperado")
                 
                 let productFound = mockData.producto.find(productoMock => productoMock.idProducto === idProdBusqueda);
                 
                 if (!productFound || productFound.length <= 0)
-                    throw new Error("Err: Producto no encontrado en API Catalogo Aval.");
+                    throw error(constantes.PROD_NO_ENC,"Err: Producto no encontrado en API Catalogo Aval.");
                 
                 if(productoMongo.length){
                     productFound.imagen = productoMongo[0].imagen;
@@ -229,8 +231,8 @@ router.get('/catalogo/productos/:id', async (req, res, next) => {
 
             }).then(producto=>res.send(producto)).catch(next);
     }        
-    catch (error) {
-        next(error);
+    catch (err) {
+        next(error(constantes.GEN_ERROR,err));
     }
 });
 
