@@ -24,6 +24,7 @@ router.get('/catalogo/productos/', async (req, res) => {
     precioMayor= req.query.to ? req.query.to :0;
     categ = req.query.categ ? req.query.categ :0; 
     disp= req.query.disp? req.query.disp:0; 
+    id= req.query.id? req.query.id:0; 
     let productsReturn;
     var valor =true;
 
@@ -62,7 +63,6 @@ router.get('/catalogo/productos/', async (req, res) => {
                         
                         
                 })
-
                 var catarray = categ ? categ.split(",") : categ;
                 var isWithinCategory = function(filterCateg, currentCategory)
                 {
@@ -88,6 +88,15 @@ router.get('/catalogo/productos/', async (req, res) => {
                 productsList.producto = productsReturn;
                 client.setex(rediskey, 30, JSON.stringify(productsList), redis.print);
                 } 
+                if (String(id) !== "0"){
+                    filterBy = {"idProducto": String(id)},
+                    productsReturn = productsList.producto.filter(function (productoActual) {
+                    if (productoActual.idProducto === filterBy.idProducto) {
+                        return true;
+                }
+                });   
+                productsList.producto = productsReturn;   
+                }
                 res.send(productsList);
                                     
             })
