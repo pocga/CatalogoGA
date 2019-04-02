@@ -1,4 +1,5 @@
 const chai = require('chai'), 
+    dictum = require('dictum.js'),
     chaiHttp = require('chai-http'),
     app = require('../src/app'),
     assertArrays = require('chai-arrays'),
@@ -25,6 +26,7 @@ describe("TechnoShop GA", () => {
                     expect(res.body.producto[0]).to.have.property('descripcion');
                     expect(res.body.producto[0]).to.have.property('imagen');
                     expect(res.body.producto[0]).to.have.property('miniatura');
+                    dictum.chai(res);
                     done();
                 })
         })
@@ -41,6 +43,7 @@ describe("TechnoShop GA", () => {
                     expect(res.body.producto[0]).to.have.property('descripcion');
                     expect(res.body.producto[0]).to.have.property('imagen');
                     expect(res.body.producto[0]).to.have.property('miniatura');
+                    dictum.chai(res);
                     done();
                 })
         })
@@ -51,6 +54,7 @@ describe("TechnoShop GA", () => {
                     expect(res.statusCode).to.be.equal(200);
                     expect(res.body).should.be.a('object');
                     expect(res.text).to.be.containing('categorias');
+                    dictum.chai(res);
                     done();
                 })
         })
@@ -61,6 +65,7 @@ describe("TechnoShop GA", () => {
                     expect(res.statusCode).to.be.equal(200);
                     expect(res.text).to.be.containing('precioMenor');
                     expect(res.text).to.be.containing('precioMayor');
+                    dictum.chai(res);
                     done();
                 })
         })
@@ -76,6 +81,7 @@ describe("TechnoShop GA", () => {
                     expect(res.body).to.have.property('descripcion');
                     expect(res.body).to.have.property('imagen');
                     expect(res.body).to.have.property('miniatura');
+                    dictum.chai(res);
                     done();
                 })
         })
@@ -85,6 +91,7 @@ describe("TechnoShop GA", () => {
                 .then(res =>{
                     expect(res.statusCode).to.be.equal(404);
                     expect(res.body.message).to.be.eql('Err: Producto no encontrado en API Catalogo Aval.');
+                    dictum.chai(res);
                     done();
                 })
         })
@@ -101,6 +108,7 @@ describe("TechnoShop GA", () => {
                     expect(res.body).to.not.have.property('descripcion');
                     expect(res.body).to.not.have.property('imagen');
                     expect(res.body).to.not.have.property('miniatura');
+                    dictum.chai(res);
                     done();
                 })
         })
