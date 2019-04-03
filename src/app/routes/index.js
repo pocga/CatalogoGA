@@ -46,7 +46,7 @@ router.get('/catalogo/productos/', async(req, res) => {
                     })
                     .then(productosMock => {
                         productosMock.producto.forEach(productoActualMock => {
-                            const productFound = productos.filter(value => parseInt(value.idProducto) === parseInt(productoActualMock.idProducto))
+                            const productFound = productos.filter(value => value.idProducto === productoActualMock.idProducto)
                             if (productFound.length > 0) {
                                 productoActualMock.imagen = productFound[0].imagen;
                                 productoActualMock.miniatura = productFound[0].miniatura;
@@ -193,9 +193,12 @@ router.get('/catalogo/productos/rango', async(req, res, next) => {
 //localhost:4000/alogo/productos/""""
 router.get('/catalogo/productos/:id', async(req, res, next) => {
 
-    const idProdBusqueda = parseInt(req.params.id);
-
     try {
+
+        const idProdBusqueda = parseInt(req.params.id);
+
+        if (isNaN(idProdBusqueda))
+            throw error(constantes.TIPO_NO_VAL, "Err: Tipo de idProducto no valido.");
 
         const productoMongo = await producto.find({ idProducto: idProdBusqueda });
 
@@ -221,7 +224,7 @@ router.get('/catalogo/productos/:id', async(req, res, next) => {
 
             }).then(producto => res.send(producto)).catch(next);
     } catch (err) {
-        next(error(constantes.GEN_ERROR, err));
+        next(err);
     }
 });
 
