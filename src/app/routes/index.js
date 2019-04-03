@@ -1,4 +1,4 @@
-const express = require('express'),
+﻿const express = require('express'),
     router = express.Router(),
     producto = require('../model/producto'),
     fetch = require('node-fetch'),
@@ -12,9 +12,6 @@ var client = redis.createClient(process.env.PORTRED, process.env.HOSTRED);
 client.on('connect', function() {
     console.log('Redis client connected');
 });
-
-
-
 
 //localhost:4000/catalogo/catalogo/productos/
 //localhost:4000/catalogo/catalogo/productos?from=####&to=#### -> Consulta por rango
