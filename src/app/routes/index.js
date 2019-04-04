@@ -1,6 +1,8 @@
 ﻿const express = require('express'),
     router = express.Router(),
     producto = require('../model/producto'),
+    imagen = require('../model/imagen'),
+    
     fetch = require('node-fetch'),
     error = require('../errores/errores'),
     constantes = require('../../constantes'),
@@ -187,6 +189,34 @@ router.get('/catalogo/productos/rango', async(req, res, next) => {
     }
 });
 
+//metodo implementado para verificar las imagenes leo - diego
+router.get('/catalogo/imagenes', async(req, res) => {
+
+
+    try {
+    
+        let validacion = true;
+        
+       //  listaImagen = { imagen: [] };
+         let listaImagen = await imagen.find(); 
+            
+            if (listaImagen.length > 0) {                
+                
+                res.send(listaImagen);
+            } else {
+                validacion = false;
+                res.send(null);
+            }
+        
+    } catch (error) {
+        console.log(error);
+        res.send(error);
+    }
+
+});
+
+
+
 //localhost:4000/alogo/productos/""""
 router.get('/catalogo/productos/:id', async(req, res, next) => {
 
@@ -224,5 +254,8 @@ router.get('/catalogo/productos/:id', async(req, res, next) => {
         next(err);
     }
 });
+
+
+
 
 module.exports = router;
