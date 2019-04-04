@@ -78,7 +78,7 @@ exports.productos = async(req, res) => {
                                     }
                                 });
                             productsList.producto = productsReturn;
-                            client.setex(rediskey, 30, JSON.stringify(productsList), redis.print);
+                            client.setex(rediskey, process.env.TMPREDIS, JSON.stringify(productsList), redis.print);
                         }
 
                         res.send(productsList);
@@ -116,7 +116,7 @@ exports.categoria = async(req, res) => {
                         return mockProductos.json();
                     })
                     .then(mockProductos => {
-                        client.setex('/catalogo/productos/categorias', 30, JSON.stringify(mockProductos), redis.print);
+                        client.setex('/catalogo/productos/categorias', process.env.TMPREDIS, JSON.stringify(mockProductos), redis.print);
                         res.send(mockProductos);
                     })
                     .catch(function(err) {
@@ -167,7 +167,7 @@ exports.rango = async(req, res, next) => {
                             }
                         })
                         range = { precioMenor, precioMayor };
-                        client.setex('/catalogo/productos/rango', 30, JSON.stringify(range), redis.print);
+                        client.setex('/catalogo/productos/rango', process.env.TMPREDIS, JSON.stringify(range), redis.print);
                         res.send(range);
                     })
                     .catch(function(err) {
