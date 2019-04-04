@@ -22,7 +22,7 @@ describe("TechnoShop GA", () => {
                     done();
                 })
         })
-        it("Deberia Pasar porque llama un producto que no existe", done => {
+        it("Deberia Pasar llama un producto que no existe", done => {
             chai.request(app)
                 .get('/catalogo/productos/1000')
                 .then(res => {
@@ -49,7 +49,7 @@ describe("TechnoShop GA", () => {
                     done();
                 })
         })
-        it("Deberia Pasar ya que existen productos que correspondan al filtro", done => {
+        it("Deberia Pasar ya que existen productos", done => {
             chai.request(app)
                 .get('/catalogo/productos/')
                 .query({ from: 0, to: 100000000, categ: 'TV', disp: true })
@@ -122,7 +122,17 @@ describe("TechnoShop GA", () => {
                     done();
                 })
         })
-
-
+        it("Deberia Pasar llama a las imagenes desde mongo para banner", done => {
+            chai.request(app)
+                .get('/catalogo/productos/imagenes')
+                .then(res => {
+                    expect(res.statusCode).to.be.equal(200);
+                    expect(res.text).to.be.containing('_id');
+                    expect(res.text).to.be.containing('nombre');
+                    expect(res.text).to.be.containing('imagen');
+                    dictum.chai(res);
+                    done();
+                })
+        })
     })
 })

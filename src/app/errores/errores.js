@@ -1,4 +1,3 @@
-
-const errorType=(errorCode,message)=>{return {errorCode : errorCode,message : message}};
+const errorType = (errorCode, message) => { return { errorCode: errorCode, message: message } };
 
 module.exports = errorType;
