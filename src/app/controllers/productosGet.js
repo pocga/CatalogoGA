@@ -197,7 +197,7 @@ exports.imagen = async(req, res, next) => {
             throw error(constantes.IMG_NO_ENC, "Err: Imagenes no tiene datos.");
 
         validacion = false;
-        res.send({ listaImagen });
+        res.send(listaImagen);
 
     } catch (error) {
         next(error);
