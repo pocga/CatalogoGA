@@ -80,7 +80,7 @@ exports.productos = async(req, res) => {
                             productsList.producto = productsReturn;
                             client.setex(rediskey, process.env.TMPREDIS, JSON.stringify(productsList), redis.print);
                         }
-
+                        client.setex(rediskey, process.env.TMPREDPR, JSON.stringify(productsList), redis.print);
                         res.send(productsList);
 
                     })
@@ -185,7 +185,7 @@ exports.rango = async(req, res, next) => {
 
 //metodo implementado para verificar las imagenes leo - diego
 //localhost:4000/catalogo/imagenes/""""
-exports.imagen = async(req, res) => {
+exports.imagen = async(req, res, next) => {
 
     try {
         let validacion = true;
