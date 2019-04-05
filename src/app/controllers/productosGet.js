@@ -9,7 +9,7 @@ const client = require('../dbconnection/dbRedisConnection'),
     mongoose = require('../dbconnection/dbConnectionMongo')
 router = express.Router();
 
-//localhost:4000/catalogo/catalogo/productos/
+//localhost:4000/catalogo/catalogo/productos/ -> Consulta todos los pedidos
 //localhost:4000/catalogo/catalogo/productos?from=####&to=#### -> Consulta por rango
 //localhost:4000/catalogo/catalogo/productos?categ="""" -> Consulta por categoria
 //localhost:4000/catalogo/catalogo/productos?disp=true/false -> Consulta por disponibilidad
