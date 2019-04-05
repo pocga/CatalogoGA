@@ -79,8 +79,10 @@ exports.productos = async(req, res) => {
                                 });
                             productsList.producto = productsReturn;
                             client.setex(rediskey, process.env.TMPREDIS, JSON.stringify(productsList), redis.print);
+                        } else {
+                            client.setex(rediskey, process.env.TMPREDPR, JSON.stringify(productsList), redis.print);
                         }
-                        client.setex(rediskey, process.env.TMPREDPR, JSON.stringify(productsList), redis.print);
+
                         res.send(productsList);
 
                     })
@@ -135,7 +137,7 @@ exports.categoria = async(req, res) => {
 }
 
 //localhost:4000/catalogo/productos/rango/
-exports.rango = async(req, res, next) => {
+exports.rango = async(req, res) => {
 
     var precio;
     var precioMenor;
@@ -198,8 +200,7 @@ exports.imagen = async(req, res, next) => {
         res.send({ listaImagen });
 
     } catch (error) {
-        console.log(error);
-        res.send(error);
+        next(error);
     }
 
 };
