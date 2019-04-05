@@ -12,7 +12,7 @@ chai.use(assertArrays);
 describe("TechnoShop GA", () => {
 
     describe("GET /", () => {
-        it("Deberia pasar porque se esta mandando un ID de texto en vez de ID numerico", done => {
+        it("Deberia pasar ya que se esta mandando un ID de texto en vez de ID numerico", done => {
             chai.request(app)
                 .get('/catalogo/productos/asdf')
                 .then(res => {
@@ -22,7 +22,7 @@ describe("TechnoShop GA", () => {
                     done();
                 })
         })
-        it("Deberia Pasar llama un producto que no existe", done => {
+        it("Deberia Pasar ya que llama un producto que no existe", done => {
             chai.request(app)
                 .get('/catalogo/productos/1000')
                 .then(res => {
@@ -84,7 +84,7 @@ describe("TechnoShop GA", () => {
                     done();
                 })
         })
-        it("Deberia Pasar llama todas las categorias", done => {
+        it("Deberia Pasar ya que llama todas las categorias", done => {
             chai.request(app)
                 .get('/catalogo/productos/categorias')
                 .then(res => {
@@ -95,7 +95,7 @@ describe("TechnoShop GA", () => {
                     done();
                 })
         })
-        it("Deberia Pasar Saca el Precio Menor y el Precio Mayor", done => {
+        it("Deberia Pasar ya que saca el Precio Menor y el Precio Mayor", done => {
             chai.request(app)
                 .get('/catalogo/productos/rango')
                 .then(res => {
@@ -106,7 +106,7 @@ describe("TechnoShop GA", () => {
                     done();
                 })
         })
-        it("Deberia Pasar llama un producto especifico", done => {
+        it("Deberia Pasar ya que llama un producto especifico", done => {
             chai.request(app)
                 .get('/catalogo/productos/5')
                 .then(res => {
@@ -122,7 +122,7 @@ describe("TechnoShop GA", () => {
                     done();
                 })
         })
-        it("Deberia Pasar llama a las imagenes desde mongo para banner", done => {
+        it("Deberia Pasar ya que llama a las imagenes desde mongo para banner", done => {
             chai.request(app)
                 .get('/catalogo/productos/imagenes')
                 .then(res => {
