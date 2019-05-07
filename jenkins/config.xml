@@ -1,0 +1,135 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>5</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.3">
+      <projectUrl>https://github.com/pocga/CatalogoGA.git/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.3">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/pocga/CatalogoGA.git</url>
+        <credentialsId>1721c795-a7c6-43d8-9e03-6a1ed6d20656</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <assignedNode>Ubuntu</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.29.3">
+      <spec></spec>
+    </com.cloudbees.jenkins.GitHubPushTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>sudo /snap/bin/docker-compose -f /home/ubuntu/jenkins/docker-compose-test-techshopga.yml up -d</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>npm install
+
+export PORT=4000
+export MOR_DEV=&quot;development&quot;
+export MONGO_ROUTE=&quot;mongodb://localhost:27017/producto&quot;
+export PORTRED=6379
+export HOSTRED=&quot;localhost&quot;
+export MOCKP_ROUTE=&quot;http://ec2-52-206-33-92.compute-1.amazonaws.com:30001/ProductosMock/AllProductos&quot;
+export MOCKC_ROUTE=&quot;http://ec2-52-206-33-92.compute-1.amazonaws.com:30001/ProductosMock/AllCategorias&quot;
+npm run test
+</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>IMAGEN_CATALOGOGA=catalogoga
+ARCHIVO_YML_CATALOGOGA=catalogo-deploy.yaml
+VERSION_CATALOGOGA=$(sudo docker images | awk &apos;($1 == &quot;pocga/catalogoga&quot;) {print $2 += .1; exit}&apos;)
+
+sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
+sudo docker build -t $DOCKER_USER/$IMAGEN_CATALOGOGA:$VERSION_CATALOGOGA . 
+sudo docker push $DOCKER_USER/$IMAGEN_CATALOGOGA:$VERSION_CATALOGOGA
+sudo docker logout
+
+curl  https://raw.githubusercontent.com/pocga/IaCGA/master/microservices/$ARCHIVO_YML_CATALOGOGA --output $ARCHIVO_YML_CATALOGOGA
+
+sed -i &apos;s/IMAGETAG/&apos;&quot;$VERSION_CATALOGOGA&quot;&apos;/g&apos; $ARCHIVO_YML_CATALOGOGA
+
+export PATH=$HOME/bin:$PATH
+/snap/bin/kubectl apply -f $ARCHIVO_YML_CATALOGOGA
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>**</artifacts>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>true</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.66">
+      <recipientList>sebastian.alarcon@sophossolutions.com, cc:daniel.rodriguez@sophossolutions.com</recipientList>
+      <configuredTriggers>
+        <hudson.plugins.emailext.plugins.trigger.AlwaysTrigger>
+          <email>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <recipientProviders>
+              <hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+              <hudson.plugins.emailext.plugins.recipients.ListRecipientProvider/>
+            </recipientProviders>
+            <attachmentsPattern></attachmentsPattern>
+            <attachBuildLog>false</attachBuildLog>
+            <compressBuildLog>false</compressBuildLog>
+            <replyTo>$PROJECT_DEFAULT_REPLYTO</replyTo>
+            <contentType>project</contentType>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.AlwaysTrigger>
+      </configuredTriggers>
+      <contentType>default</contentType>
+      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+      <defaultContent>$DEFAULT_CONTENT</defaultContent>
+      <attachmentsPattern></attachmentsPattern>
+      <presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
+      <postsendScript>$DEFAULT_POSTSEND_SCRIPT</postsendScript>
+      <attachBuildLog>true</attachBuildLog>
+      <compressBuildLog>true</compressBuildLog>
+      <replyTo>$DEFAULT_REPLYTO</replyTo>
+      <from>pocga@sophossolutions.com</from>
+      <saveOutput>false</saveOutput>
+      <disabled>false</disabled>
+    </hudson.plugins.emailext.ExtendedEmailPublisher>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.37">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.9"/>
+  </buildWrappers>
+</project>
